@@ -1,0 +1,122 @@
+<html>
+	<body>
+		<div>
+			<input type="text" id="amount">
+			<p id="balance"></p>
+
+			<button id="deposit">Deposit</button>
+			<button id="withdraw">Withdraw</button>
+		</div>
+
+<!-- jquery cdn-->
+<script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+
+<!-- web3.js cdn -->
+<script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.0.0-beta.36/dist/web3.min.js"></script>
+  
+<script>
+	var contract;
+
+	$(document).ready(function(){
+		// whenever the page is ready create a web3 object
+		web3 = new Web3(web3.currentProvider);
+
+		// initialise the contract (creating contract object)
+		// contract object takes two parameters:
+		// i) ABI     ii) My smart contract Address
+		var address = "0xE777697842E87c0b44579F2871DB2F88F527CC63";
+		var abi = [{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "amt",
+				"type": "int256"
+			}
+		],
+		"name": "deposit",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "amt",
+				"type": "int256"
+			}
+		],
+		"name": "withdraw",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "getBalance",
+		"outputs": [
+			{
+				"name": "",
+				"type": "int256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	}
+	];
+		contract = new web3.eth.Contract(abi, address);
+
+		//fetching balance (data)
+		contract.methods.getBalance().call().then(function(bal){
+
+			$('#balance').html(bal);
+		})
+	})
+	
+	// when deposit button is clicked
+	$('#deposit').click(function(){
+		// fetch the value entered in the text field
+		var amt = 0;
+		amt = parseInt($('#amount').val());
+		// we would require account for withdrawl/deposit
+		// therefore using `web3` accounts
+		web3.eth.getAccounts().then(function(accounts){
+			return contract.methods.deposit(amt).send({from: accounts[0]});
+		}).then(function(tx){
+			// if there is some error
+			console.log(tx);
+		}).catch(function(tx){
+			console.log(tx);
+		})
+	})
+
+	// when withdraw button is clicked
+	$('#withdraw').click(function(){
+		// fetch the value entered in the text field
+		var amt = 0;
+		amt = parseInt($('#amount').val());
+		// we would require account for withdrawl/deposit
+		// therefore using `web3` accounts
+		web3.eth.getAccounts().then(function(accounts){
+			return contract.methods.withdraw(amt).send({from: accounts[0]});
+		}).then(function(tx){
+			// if there is some error
+			console.log(tx);
+		}).catch(function(tx){
+			console.log(tx);
+		})
+	})
+	
+</script>
+	</body>
+</html>
